@@ -1,0 +1,46 @@
+﻿
+
+NUEVO REGISTRO DE USUARIO 
+
+Cuando se ha llevado a cabo con éxito, se añade a los campos exitentes (nombre, prefijo, teléfono, etc.) el token de Firebase.
+
+String token = FirebaseInstanceId.getInstance().getToken();
+
+Y se envía al backend un json con la información del usuario.
+
+
+También ha de enviarse el listado de sus contactos a los que se tiene que notificar de dicho registro. Pero como no se tiene permiso para acceder a los mismos hasta que se está en la vista de contactos, podemos guardar un flag en preferencias indicando que el usuario se acaba de registrar y que, llegados a dicha vista, se deben enviar al backend:
+- Teléfono
+   
+______________________________________
+
+
+HAY 2 OPCIONES:	
+
+1. Implementación de los hooks. En ese caso sólo haría falta pasarle el token de usuario al backend en 2 puntos:
+	- Cuando el usuario hace el login ("UserLoginActivity.java" -> onCreate()):
+		String token = FirebaseInstanceId.getInstance().getToken();
+		metodoDeBackendQueSea(token); // Se añade al campo User, y se guarda junto al resto de datos en Firebase. Importante, tiene que ser un array para multidispositivo
+
+	- En el servicio de notificaciones ("/notifications/services/YoypicFirebaseInstanceIDService.java" -> sendRegistrationToServer()):
+		metodoDeBackendQueSea(refreshedToken);	// Se añade al campo User, y se guarda junto al resto de datos en Firebase. Importante, tiene que ser un array para multidispositivo
+
+	- Hooks:
+		- Cuando compartes una foto con alguien -> hook a files/byuser (onAddEvent)
+		- Cuando ves una foto que no es tuya --> hook en files/byId (onChangeEvent). Campo interactions->view
+		- Cuando intentas ver una foto de la cual no tienes permisos --> hook en files/byId (onChangeEvent). Campo interactions->blocked
+		- Cuando intentas hacer una captura de pantalla (probablemente no aplicable a Android) --> hook en files/byId (onChangeEvent). Campo interactions-screenshots
+		- Cuando cancelas los permisos de acceso a un usuario, hay que enviar una notificación a ese usuario -> hook a files/byuser (onRemoveEvent)
+
+2. API REST tradicional. En ese caso hay que crear un servicio con métodos públicos que se comnunicará con la API en los supuestos en los que haga falta, a saber:
+		- Nuevo registro (cuando un usuario se registra hay que enviar una notificación a todos tus contactos que tienen la app)
+		- Cuando compartes una foto con alguien, debes enviar una notificación a ese alguien
+		- Cuando ves una foto que no es tuya, hay que enviar una notificación a su creador.
+		- Cuando intentas ver una foto de la cual no tienes permisos, debes enviar una notificación al creador.
+		- Cuando intentas hacer una captura de pantalla (probablemente no aplicable a Android)
+		- Cuando cancelas los permisos de acceso a un usuario, hay que enviar una notificación a ese usuario.
+
+	
+______________________________________
+
+

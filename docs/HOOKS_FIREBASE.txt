@@ -1,0 +1,6 @@
+﻿- Hooks:
+		- Cuando compartes una foto con alguien -> hook a files/byuser (onAddEvent)
+		- Cuando ves una foto que no es tuya --> hook en files/byId (onChangeEvent). Campo interactions->view
+		- Cuando intentas ver una foto de la cual no tienes permisos --> hook en files/byId (onChangeEvent). Campo interactions->blocked
+		- Cuando intentas hacer una captura de pantalla (probablemente no aplicable a Android) --> hook en files/byId (onChangeEvent). Campo interactions-screenshots
+		- Cuando cancelas los permisos de acceso a un usuario, hay que enviar una notificación a ese usuario -> hook a files/byuser (onRemoveEvent)
