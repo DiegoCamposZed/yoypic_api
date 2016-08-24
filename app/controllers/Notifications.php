@@ -14,8 +14,6 @@ class Notifications
 {
     protected $request;
     protected $response;
-//    protected $tokenRepository;
-//    protected $userRepository;
 
     public function sendNotification()
     {
@@ -23,10 +21,6 @@ class Notifications
 
         $body = $this->app->request()->getBody();
         $bodyObj = json_decode($body);
-
-//        var_dump($bodyObj);
-//        $notification = new Notification($bodyObj->type, $bodyObj->receivers, $bodyObj->data);
-
 
         $msisdns = $bodyObj->destinationIds ;
         $tokens = $this->getCurrentTokensByMsisdn($msisdns);
@@ -36,16 +30,7 @@ class Notifications
                 $notification = new FirebaseNotification($token->getId(), '', $bodyObj);
 
                 $responseBody = $notification->jsonSerialize();
-/*
-                $responseBody['to'] = $notification->getTo();
-                $responseBody['data'] = $notification->getData();
-                $responseBody['notification'] = $notification->getNotification();
 
-
-                var_dump($notification->jsonSerialize());
-*/
-//                var_dump($responseBody);
-//                die();
                 try {
                     $response = $this->app->guzzle->post('https://fcm.googleapis.com/fcm/send',
                         [
@@ -126,9 +111,6 @@ class Notifications
     public function init()
     {
         // do things now that app, request and response are set.
-//        $this->tokenRepository = $this->app->container->get('TokenRepository');
-
-//        $this->userRepository = $this->app->container->get('UserRepository');
 
     }
 }
