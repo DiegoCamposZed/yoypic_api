@@ -44,10 +44,15 @@ class Notifications
                         ]
                     );
                     echo $response->getBody();
+                    $this->app->log->info("Yoypic: send Notification: TOKEN: " . $token->getId() . " USER: " . $token->getUid() . " RESULT: " .$response->getBody());
                 } catch (RequestException $e) {
                     echo $e->getRequest() . "\n";
+                    $this->app->log->error("Yoypic: send Notification ERROR REQUEST : " .$e->getRequest());
+
                     if ($e->hasResponse()) {
                         echo $e->getResponse() . "\n";
+                        $this->app->log->error("Yoypic: send Notification ERROR RESPONSE : " .$e->getResponse());
+
                     }
                 }
 

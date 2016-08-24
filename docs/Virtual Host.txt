@@ -1,0 +1,24 @@
+virtualhost para el Wamp:
+
+Hay que agregar al final del archivo httpd-vhosts.conf que esta en:
+
+[WAMP DIRECTORY]\bin\apache\[APACHE VERSION]\conf\extra
+
+
+<VirtualHost *:80>
+    ServerAdmin dcampos@zed.com
+    DirectoryIndex index.php
+    ServerName yoypicapi2.dev
+    DocumentRoot 'C:/Users/DCampos/Documents/Glass/yoypicapi2/public'
+    <Directory 'C:/Users/DCampos/Documents/Glass/yoypicapi2' >
+        Options Indexes FollowSymLinks MultiViews
+        AllowOverride all
+      <IfDefine APACHE24>
+        Require all granted
+      </IfDefine>
+      <IfDefine !APACHE24>
+        Allow from All
+        Order allow,deny
+      </IfDefine>
+    </Directory>
+</VirtualHost>
