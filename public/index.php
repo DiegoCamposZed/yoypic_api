@@ -49,7 +49,7 @@ $app = new \RKA\Slim(array(
 
 require '../app/config/config.php';
 
-// Create monolog logger and store logger in container as singleton 
+// Create monolog logger and store logger in container as singleton
 // (Singleton resources retrieve the same log resource definition each time)
 $app->container->singleton('log', function () {
     $log = new \Monolog\Logger('slim-skeleton');
@@ -88,10 +88,13 @@ $app->view->parserOptions = array(
 $app->view->parserExtensions = array(new \Slim\Views\TwigExtension());
 
 // Repositories
+
+// User Repository
 $app->container->singleton('userRepository', function ($c) {
     return new \App\repositories\UserRepository($c);
 });
 
+// Token Repository
 $app->container->singleton('tokenRepository', function ($c) {
     return new \App\repositories\TokenRepository($c);
 });
