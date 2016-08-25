@@ -93,7 +93,7 @@ class FirebaseNotification implements \JsonSerializable
         else
             return [
                 'to' => $this->to,
-                'data' => get_object_vars($this->data)
+                'data' => $this->data->content
             ];
 
     }
