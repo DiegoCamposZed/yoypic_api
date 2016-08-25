@@ -20,6 +20,7 @@ class Notifications
 
 
         $body = $this->app->request()->getBody();
+
         $bodyObj = json_decode($body);
 
         $msisdns = $bodyObj->destinationIds ;
@@ -69,19 +70,15 @@ class Notifications
         try{
             if(is_string($msisdns))
                 $msisdns = array($msisdns);
+                $users = $this->app->userRepository->findAll(array());
 
-            foreach($msisdns as $msisdn){
-                $parameters = array('orderBy' => '"msisdn"', 'equalTo' => '"' .$msisdn . '"');
-                $users = $this->app->userRepository->findAll($parameters);
                 foreach($users as $user){
-                    $parameters = array('orderBy' => '"uid"', 'equalTo' => '"' .$user->getUid() . '"');
-
-                    $userTokens = $this->app->tokenRepository->findAll($parameters);
-
-                    $tokens = array_merge($tokens, $userTokens);
-
+                    if(array_search($user->getMsisdn(),$msisdns) !== false || array_search($user->getPhonePrefix() . $user->getMsisdn(),$msisdns) !== false) {
+                      $parameters = array('orderBy' => '"uid"', 'equalTo' => '"' .$user->getUid() . '"');
+                      $userTokens = $this->app->tokenRepository->findAll($parameters);
+                      $tokens = array_merge($tokens, $userTokens);
+                    }
                 }
-            }
 
             if(!empty($tokens))
                 return $tokens;
