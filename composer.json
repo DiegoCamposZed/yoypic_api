@@ -3,6 +3,7 @@
     "description": "A PHP-MVC Slim Framework skeleton application for rapid development",
     "keywords": ["microframework","rest","router"],
     "homepage": "http://github.com/seromenho/Slim-Skeleton",
+    "minimum-stability": "stable",
     "authors": [
         {
             "name": "Ricardo Seromenho",
@@ -17,8 +18,7 @@
         "slim/views": "0.*",
         "twig/twig": "1.*",
         "ktamas77/firebase-php": "2.2.0",
-        "akrabat/rka-slim-controller": "2.0.1",
-        "guzzlehttp/guzzle": "5.0.0",
+        "guzzle/guzzle": "3.9.3",
         "giggsey/libphonenumber-for-php": "7.5.2"
     },
     "autoload": {

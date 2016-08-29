@@ -33,6 +33,7 @@ class Notifications
                 $responseBody = $notification->jsonSerialize();
 
                 try {
+/*
                     $response = $this->app->guzzle->post('https://fcm.googleapis.com/fcm/send',
                         [
                             'verify' => false,
@@ -44,6 +45,19 @@ class Notifications
                             'body' => $responseBody
                         ]
                     );
+*/
+                    $request = $this->app->guzzle->post('https://fcm.googleapis.com/fcm/send',
+                            [
+                                'Content-Type'  => 'application/json',
+                                'Authorization' => 'key=AIzaSyDQOmiaVwz_F13I_eA7pODoguCHOjrElKM',
+
+                            ],
+                            $responseBody,
+                            [
+                            ]
+                    );
+
+                    $response = $request->send();
                     echo $response->getBody();
                     $this->app->log->info("Yoypic: send Notification: TOKEN: " . $token->getId() . " USER: " . $token->getUid() . " RESULT: " .$response->getBody());
                 } catch (RequestException $e) {

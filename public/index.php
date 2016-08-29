@@ -3,6 +3,8 @@ define('APP_PATH', dirname(__DIR__)); // PHP v5.3+
 
 require '../vendor/autoload.php';
 
+require 'ZedSlim.php';
+
 define("USER_AUTHORIZED", true);
 define("APP_NAME", 'YOYPIC API');
 
@@ -15,7 +17,7 @@ $app = new \Slim\Slim(array(
 */
 
 // init app
-$app = new \RKA\Slim(array(
+$app = new \ZED\Slim(array(
     'mode' => 'development',
     'templates.path' => '../app/views',
     'settings' => [
@@ -59,7 +61,7 @@ $app->container->singleton('log', function () {
 
 // Firebase
 $app->container->singleton('firebase', function () {
-    $app = \RKA\Slim::getInstance();
+    $app = \ZED\Slim::getInstance();
     $settings = $app->container->get('settings');
 
     return new \Firebase\FirebaseLib($settings['settings']['firebase']['default_url'], $settings['settings']['firebase']['default_token']);
@@ -67,13 +69,17 @@ $app->container->singleton('firebase', function () {
 
 // Guzzle
 $app->container->singleton('guzzle', function(){
-    $app = \RKA\Slim::getInstance();
+    $app = \ZED\Slim::getInstance();
     $settings = $app->container->get('settings');
-
-    return new GuzzleHttp\Client([
+/*
+    return new Guzzle\Http\Client([
                                     'verify' => false,
                                     'base_url' => $settings['settings']['firebase']['default_fcm_url']
                                  ]);
+*/
+    return new Guzzle\Http\Client($settings['settings']['firebase']['default_fcm_url']);
+
+
 });
 
 // Prepare view
