@@ -43,12 +43,6 @@ class Files
                     $localPaths = (isset($file->localPaths) ? $file->localPaths : '');
                     $interactions = (isset($file->interactions) ? $file->interactions : '');
 
-                    /*
-                    if($last < $ownerId){
-                        echo 'last --> ' . $ownerId . '<br>';
-                        $last = $ownerId;
-                    }
-    */
                     $files[] = new File($id, $message, $ownerId, $title, $url,
                                        $createdAt, $updatedAt, $acl, $localPaths, $interactions);
                 }

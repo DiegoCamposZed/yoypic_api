@@ -20,39 +20,70 @@ class UserRepository extends BaseRepository implements  BaseRepositoryInterface 
 
     public function findOne($parameters)
     {
-        $result = null;
 
-        $options = array_merge($parameters, array('limitToFirst'=>1));
+//        $options = array_merge($parameters, array('limitToFirst'=>1));
+        $options = array_merge($parameters, array());
         $json = json_decode($this->firebase->get('users', $options));
-        if($json != null){
-            foreach($json as $user){
-                $result = new User($user->uid, $user->username, $user->msisdn, $user->phonePrefix, $user->createdAt, $user->lastLoginAt, $user->updatedAt);
+
+        $array = (array) $json;
+        if($json != null && !empty($array)){
+            foreach($json as $userObj){
+                $result = $this->objectToUser($userObj);
             }
+            return $result;
+
         }
-        return $result;
+        return null;
     }
 
     public function findAll($parameters = array())
     {
+
         $json = json_decode($this->firebase->get('users', $parameters));
+        $array = (array) $json;
+        if($json != null && !empty($array)){
+            foreach ($json as $userObj) {
+                $users[] = $this->objectToUser($userObj);
 
-        $users = array();
-        if ($json != null) {
-            foreach ($json as $user) {
-                $users[] = new User($user->uid, $user->username, $user->msisdn, $user->phonePrefix, $user->createdAt, $user->lastLoginAt, $user->updatedAt);
             }
+            return $users;
         }
-        return $users;
+
+        return null;
+    }
+
+    public function save($data)
+    {
+
+        if(!empty($data) && property_exists($data, "uid")){
+
+            $newUser = $this->objectToUser($data);
+            return $this->firebase->set('users/' . $newUser->getUid() , $newUser);
+        }
+        else
+            return false;
+    }
+
+    public function remove($uid)
+    {
+        if(!empty($uid)){
+
+            return $this->firebase->set('users/' . $uid , null);
+        }
+        else
+            return false;
 
     }
 
-    public function save($user)
-    {
-        // TODO: Implement save() method.
-    }
+    public function objectToUser($userObj){
+        $uid = property_exists($userObj, 'uid') ? $userObj->uid : null;
+        $username = property_exists($userObj, 'username') ? $userObj->username : null;
+        $msisdn = property_exists($userObj, 'msisdn') ? $userObj->msisdn : null;
+        $phonePrefix = property_exists($userObj, 'phonePrefix') ? $userObj->phonePrefix : null;
+        $createdAt = property_exists($userObj, 'createdAt') ? $userObj->createdAt : null;
+        $lastLoginAt = property_exists($userObj, 'lastLoginAt') ? $userObj->lastLoginAt : null;
+        $updatedAt = property_exists($userObj, 'updatedAt') ? $userObj->updatedAt : null;
 
-    public function remove($user)
-    {
-        // TODO: Implement remove() method.
+        return new User($uid, $username, $msisdn, $phonePrefix, $createdAt, $lastLoginAt, $updatedAt);
     }
 }

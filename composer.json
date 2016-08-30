@@ -1,14 +1,14 @@
 {
-    "name": "seromenho/slim-skeleton",
-    "description": "A PHP-MVC Slim Framework skeleton application for rapid development",
-    "keywords": ["microframework","rest","router"],
-    "homepage": "http://github.com/seromenho/Slim-Skeleton",
+    "name": "Yoypic API",
+    "description": "REST API for Yoypic",
+    "keywords": ["yoypic","rest"],
+    "homepage": "http://www.bitmonlab.com/",
     "minimum-stability": "stable",
     "authors": [
         {
-            "name": "Ricardo Seromenho",
-            "email": "ricardo@seromenho.com",
-            "homepage": "http://www.seromenho.com/"
+            "name": "Diego Campos",
+            "email": "diego.campos@bitmonlab.com",
+            "homepage": ""
         }
     ],
     "require": {

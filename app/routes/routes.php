@@ -29,6 +29,10 @@ $app->get('/files/byowner/:uid', 'App\controllers\Files:getFilesByOwner');
 $app->get('/users/subscribed/:contacts+', 'App\controllers\Users:getSubscribedContacts');
 $app->post('/users/subscribed', 'App\controllers\Users:mySubscribedContacts');
 $app->get('/users/msisdn/:msisdn+', 'App\controllers\Users:getUserByMsisdn');
+$app->get('/users/:uid', 'App\controllers\Users:getUserByUid');
+$app->post('/users', 'App\controllers\Users:add');
+$app->delete('/users/:uid', 'App\controllers\Users:delete');
+
 
 /*
  * Token Routes

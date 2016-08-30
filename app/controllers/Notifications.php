@@ -8,6 +8,7 @@
 
 namespace App\controllers;
 
+use App\models\Error;
 use App\models\FirebaseNotification;
 
 class Notifications
@@ -18,62 +19,79 @@ class Notifications
     public function sendNotification()
     {
 
+        $payload = new \stdClass();
 
         $body = $this->app->request()->getBody();
 
         $bodyObj = json_decode($body);
 
-        $msisdns = $bodyObj->destinationIds ;
-        $tokens = $this->getCurrentTokensByMsisdn($msisdns);
+        // Get notification Field
+        $notification = '';
+        if(property_exists($bodyObj, 'notification'))
+            $notification = $bodyObj->notification;
 
-        if($tokens){
-            foreach($tokens as $token){
-                $notification = new FirebaseNotification($token->getId(), '', $bodyObj);
+        // Get data Field
+        $data = '';
+        if(property_exists($bodyObj, 'data'))
+            $data = $bodyObj->data;
 
-                $responseBody = $notification->jsonSerialize();
+        if(property_exists($bodyObj, 'to')) {
+            $msisdns = $bodyObj->to;
+        } else if(property_exists($bodyObj, 'destinationIds')){
+            $msisdns = $bodyObj->destinationIds;
+        }
 
-                try {
-/*
-                    $response = $this->app->guzzle->post('https://fcm.googleapis.com/fcm/send',
-                        [
-                            'verify' => false,
-                            'headers' => [
-                                'Content-Type'  => 'application/json',
-                                'Authorization' => 'key=AIzaSyDQOmiaVwz_F13I_eA7pODoguCHOjrElKM',
+        if($msisdns){
+            $tokens = $this->getCurrentTokensByMsisdn($msisdns);
+            if($tokens){
+                foreach($tokens as $token){
+                    $notificationObj = new FirebaseNotification($token->getId(), $notification, $data);
 
-                            ],
-                            'body' => $responseBody
-                        ]
-                    );
-*/
-                    $request = $this->app->guzzle->post('https://fcm.googleapis.com/fcm/send',
+                    $responseBody = $notificationObj->jsonSerialize();
+
+                    try {
+                        $request = $this->app->guzzle->post('https://fcm.googleapis.com/fcm/send',
                             [
                                 'Content-Type'  => 'application/json',
                                 'Authorization' => 'key=AIzaSyDQOmiaVwz_F13I_eA7pODoguCHOjrElKM',
-
                             ],
                             $responseBody,
-                            [
-                            ]
-                    );
+                            []
+                        );
 
-                    $response = $request->send();
-                    echo $response->getBody();
-                    $this->app->log->info("Yoypic: send Notification: TOKEN: " . $token->getId() . " USER: " . $token->getUid() . " RESULT: " .$response->getBody());
-                } catch (RequestException $e) {
-                    echo $e->getRequest() . "\n";
-                    $this->app->log->error("Yoypic: send Notification ERROR REQUEST : " .$e->getRequest());
+                        $response = $request->send();
 
-                    if ($e->hasResponse()) {
-                        echo $e->getResponse() . "\n";
-                        $this->app->log->error("Yoypic: send Notification ERROR RESPONSE : " .$e->getResponse());
+                        $payload->data[] = " Send Notification: " . $token->getUid() . " RESULT: " .$response->getBody();
+                        $this->app->log->info(APP_NAME . " Send Notification: TOKEN: " . $token->getId() . " USER: " . $token->getUid() . " RESULT: " .$response->getBody());
 
+
+                    } catch (RequestException $e) {
+
+  //                      echo $e->getRequest() . "\n";
+                        $this->app->log->error(APP_NAME . " Send Notification ERROR REQUEST : " .$e->getRequest());
+                        $payload->error[] = new Error($e->getCode(), " Send Notification ERROR REQUEST : " .$e->getRequest(), '');
+
+                        if ($e->hasResponse()) {
+//                            echo $e->getResponse() . "\n";
+                            $this->app->log->error(APP_NAME . " Send Notification ERROR RESPONSE : " .$e->getResponse());
+                            $payload->error[] = new Error($e->getCode(), " Send Notification ERROR RESPONSE : " .$e->getResponse(), '');
+
+                        }
                     }
+
                 }
+
+            } else {
+                $this->app->log->error(APP_NAME . " Send Notification: Tokens not found for: " . implode(',', $msisdns));
+                $payload->error = new Error(404, " Send Notification: Tokens not found for: " . implode(',', $msisdns), '');
 
             }
 
+            $this->response->headers->set('Content-Type', 'application/json');
+            echo json_encode($payload);
+
         }
+
     }
 
     public function getCurrentTokensByMsisdn($msisdns)
@@ -84,21 +102,21 @@ class Notifications
         try{
             if(is_string($msisdns))
                 $msisdns = array($msisdns);
-                $users = $this->app->userRepository->findAll(array());
 
-                foreach($users as $user){
-                    if(array_search($user->getMsisdn(),$msisdns) !== false || array_search($user->getPhonePrefix() . $user->getMsisdn(),$msisdns) !== false) {
-                      $parameters = array('orderBy' => '"uid"', 'equalTo' => '"' .$user->getUid() . '"');
-                      $userTokens = $this->app->tokenRepository->findAll($parameters);
-                      $tokens = array_merge($tokens, $userTokens);
-                    }
+            $users = $this->app->userRepository->findAll(array());
+            foreach($users as $user){
+                if(array_search($user->getMsisdn(),$msisdns) !== false || array_search($user->getPhonePrefix() . $user->getMsisdn(),$msisdns) !== false) {
+                  $parameters = array('orderBy' => '"uid"', 'equalTo' => '"' .$user->getUid() . '"');
+                  $userTokens = $this->app->tokenRepository->findAll($parameters);
+                  $tokens = array_merge($tokens, $userTokens);
                 }
+            }
 
             if(!empty($tokens))
                 return $tokens;
 
         } catch(\Exception $e){
-            $this->app->log->error("Yoypic: getCurrentTokensByUserId: " . $e->getMessage());
+            $this->app->log->error(APP_NAME . " getCurrentTokensByUserId: " . $e->getMessage());
 
         }
 

@@ -17,8 +17,6 @@ class Tokens
     protected $app;
     protected $request;
     protected $response;
-//    protected $tokenRepository;
-//    protected $userRepository;
 
     public function index()
     {
@@ -36,7 +34,7 @@ class Tokens
 
             $payload->data = $tokens;
         } catch(\Exception $e){
-            $this->app->log->error("Yoypic: getCurrentTokens: " . $e->getMessage());
+            $this->app->log->error(APP_NAME . " getCurrentTokens: " . $e->getMessage());
 
         }
 
@@ -75,7 +73,7 @@ class Tokens
                 $payload->data = $tokens;
 
         } catch(\Exception $e){
-            $this->app->log->error("Yoypic: getCurrentTokensByUserId: " . $e->getMessage());
+            $this->app->log->error(APP_NAME . " getCurrentTokensByUserId: " . $e->getMessage());
 
         }
 
@@ -112,7 +110,7 @@ class Tokens
                 $payload->data = $tokens;
 
         } catch(\Exception $e){
-            $this->app->log->error("Yoypic: getCurrentTokensByUserId: " . $e->getMessage());
+            $this->app->log->error(APP_NAME . " getCurrentTokensByUserId: " . $e->getMessage());
 
         }
 
@@ -141,11 +139,6 @@ class Tokens
     public function init()
     {
         // do things now that app, request and response are set.
-//        $this->tokenRepository = new TokenRepository($this->app);
-//        $this->userRepository = new UserRepository($this->app);
-//        $this->tokenRepository = $this->app->container->get('TokenRepository');
-
-//        $this->userRepository = $this->app->container->get('UserRepository');
 
     }
 
