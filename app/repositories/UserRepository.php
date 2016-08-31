@@ -52,6 +52,23 @@ class UserRepository extends BaseRepository implements  BaseRepositoryInterface 
         return null;
     }
 
+    public function findSubscribedContacts($contacts){
+
+        $result = array();
+
+        $parameters = array();
+        $users = $this->findAll($parameters);
+
+        foreach($users as $user){
+            if(array_search($user->getPhonePrefix() . $user->getMsisdn(),$contacts) !== false
+            || array_search($user->getMsisdn(),$contacts) !== false)
+                $result[] = $user;
+        }
+
+        return $result;
+
+    }
+
     public function save($data)
     {
 

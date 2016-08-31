@@ -11,7 +11,7 @@ $app->get('/', function () use ($app) {
     // Sample log message
     $app->log->info("Yoypic '/' route");
     // Render index view
-    $app->render('home.html');
+    $app->render('swagger.html');
 });
 
 

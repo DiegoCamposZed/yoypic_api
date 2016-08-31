@@ -85,24 +85,15 @@ class Users
 
     public function getSubscribedContacts($contacts)
     {
-        $result = array();
-
         $payload = new \stdClass();
 
         try{
-            $users = $this->app->userRepository->findAll(array());
 
-            if($users != null) {
+            $result = $this->app->userRepository->findSubscribedContacts($contacts);
 
-                foreach ($users as $user) {
-                    if (array_search($user->getMsisdn(), $contacts) !== false || array_search($user->getPhonePrefix() . $user->getMsisdn(), $contacts) !== false)
-                        $result[] = $user;
-                }
-            } else {
-                $payload->error = new Error(404, 'Data not available', '');
-
-            }
             $payload->data = $result;
+            if(empty($result))
+                $payload->error = new Error(404, 'Data not available', '');
 
         } catch(\Exception $e){
             $this->app->log->error(APP_NAME . " getSubscribedContacts: " . $e->getMessage());
@@ -117,32 +108,25 @@ class Users
 
     public function mySubscribedContacts()
     {
-        $result = array();
-
         $payload = new \stdClass();
 
         try{
+
             $body = $this->app->request()->getBody();
             $contactList = json_decode($body);
+
             $contacts = array();
             foreach($contactList->contacts as $contact){
 
                 $contacts[] = trim($contact->phonePrefix) . ($contact->phoneNumber);
             }
 
-            $users = $this->app->userRepository->findAll(array());
-
-
-            foreach($users as $user){
-                if(array_search($user->getPhonePrefix() . $user->getMsisdn(),$contacts) !== false)
-                    $result[] = $user;
-/*
-                if(array_search($user->getMsisdn(),$contacts) !== false || array_search($user->getPhonePrefix() . $user->getMsisdn(),$contacts) !== false)
-                    $result[] = $user;
-*/
-            }
+            $result = $this->app->userRepository->findSubscribedContacts($contacts);
 
             $payload->data = $result;
+            if(empty($result))
+                $payload->error = new Error(404, 'Data not available', '');
+
         } catch(\Exception $e){
             $this->app->log->error(APP_NAME . " mySubscribedContacts: " . $e->getMessage());
             $payload->error = new Error($e->getCode(), $e->getMessage(), '');
