@@ -89,7 +89,7 @@ class Notifications
 
                 }
 
-                $payload->result = array('success' => $success, 'failure' => $failure );
+                $payload->data = array('success' => $success, 'failure' => $failure );
 
             } else {
                 $this->app->log->error(APP_NAME . " Send Notification: Tokens not found for: " . implode(',', $msisdns));
