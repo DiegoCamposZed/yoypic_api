@@ -55,7 +55,7 @@ class Notifications
                                 'Content-Type'  => 'application/json',
                                 'Authorization' => 'key=AIzaSyDQOmiaVwz_F13I_eA7pODoguCHOjrElKM',
                             ],
-                            $responseBody,
+                            json_encode($responseBody),
                             []
                         );
 
