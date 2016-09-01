@@ -44,10 +44,13 @@ class Notifications
         if($msisdns){
             $tokens = $this->getCurrentTokensByMsisdn($msisdns);
             if($tokens){
+                $success = 0;
+                $failure = 0;
+
                 foreach($tokens as $token){
                     $notificationObj = new FirebaseNotification($token->getId(), $notification, $data);
 
-                    $responseBody = $notificationObj->jsonSerialize();
+                    $requestBody = $notificationObj->jsonSerialize();
 
                     try {
                         $request = $this->app->guzzle->post('https://fcm.googleapis.com/fcm/send',
@@ -55,24 +58,29 @@ class Notifications
                                 'Content-Type'  => 'application/json',
                                 'Authorization' => 'key=AIzaSyDQOmiaVwz_F13I_eA7pODoguCHOjrElKM',
                             ],
-                            json_encode($responseBody),
+                            json_encode($requestBody),
                             []
                         );
 
                         $response = $request->send();
 
-                        $payload->data[] = " Send Notification: " . $token->getUid() . " RESULT: " .$response->getBody();
-                        $this->app->log->info(APP_NAME . " Send Notification: TOKEN: " . $token->getId() . " USER: " . $token->getUid() . " RESULT: " .$response->getBody());
 
+                        $responseBody = $response->json();
+
+                        if(isset($responseBody['success']) && $responseBody['success'] == 1)
+                            $success++;
+
+                        if(isset($responseBody['failure']) && $responseBody['failure'] == 1)
+                            $failure++;
+
+                        $this->app->log->info(APP_NAME . " Send Notification: TOKEN: " . $token->getId() . " USER: " . $token->getUid() . " RESULT: " . $response->getBody());
 
                     } catch (RequestException $e) {
 
-  //                      echo $e->getRequest() . "\n";
                         $this->app->log->error(APP_NAME . " Send Notification ERROR REQUEST : " .$e->getRequest());
                         $payload->error[] = new Error($e->getCode(), " Send Notification ERROR REQUEST : " .$e->getRequest(), '');
 
                         if ($e->hasResponse()) {
-//                            echo $e->getResponse() . "\n";
                             $this->app->log->error(APP_NAME . " Send Notification ERROR RESPONSE : " .$e->getResponse());
                             $payload->error[] = new Error($e->getCode(), " Send Notification ERROR RESPONSE : " .$e->getResponse(), '');
 
@@ -80,6 +88,8 @@ class Notifications
                     }
 
                 }
+
+                $payload->result = array('success' => $success, 'failure' => $failure );
 
             } else {
                 $this->app->log->error(APP_NAME . " Send Notification: Tokens not found for: " . implode(',', $msisdns));

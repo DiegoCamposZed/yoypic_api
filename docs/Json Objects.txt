@@ -1,0 +1,58 @@
+Old Notification
+{
+    "type": "newUserRegisterRegistered",
+    "destinationIds": ["652354689","633258477","611239684","648985623"],
+    "content": "Tu amigo Enrique se acaba de registrar en Yoypic."
+}
+
+
+Notification
+{
+	"data": {
+		"pictureId": "Picture id de data",
+		"pictureName": "Picture name de data",
+		"type": 0
+	},
+	"notification": {
+		"body": "Body de notification",
+		"icon": "Icon de notification",
+		"title": "Title de notification"
+	},
+	"to": ["+34618169342", "+34654661693", "+34655586104", "+34646547055", "+34608594047"]
+}
+
+{
+	"data": {
+		"pictureId": "Picture id de data",
+		"pictureName": "Picture name de data",
+		"type": 0
+	},
+	"notification": {
+		"body": "Body de notification",
+		"icon": "Icon de notification",
+		"title": "Title de notification"
+	},
+	"to": ["+34618169342", "+34654661693", "+34608594047", "+34646547055"]
+}
+
+User
+{
+	"uid": "1",
+	"username": "testAdd",
+	"msisdn": "666666666",
+	"phonePrefix": "+34",
+	"createdAt": 1472547119000,
+	"lastLoginAt": 1472547119000,
+	"updatedAt": 1472547119000
+}
+
+{
+	"contacts": [{
+			"phonePrefix": "+34",
+			"phoneNumber": "618169342"
+			},
+			{
+			"phonePrefix": "+47 ",
+			"phoneNumber": "086667873"
+		}]
+}
