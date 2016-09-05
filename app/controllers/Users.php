@@ -113,16 +113,22 @@ class Users
         try{
 
             $body = $this->app->request()->getBody();
-            $contacts = json_decode($body);
-/*
-            $contactList = json_decode($body);
+//            $contacts = json_decode($body);
+
+            $contactsList = json_decode($body);
 
             $contacts = array();
-            foreach($contactList->contacts as $contact){
-
-                $contacts[] = trim($contact->phonePrefix) . ($contact->phoneNumber);
+            if(!is_array($contactsList)){
+                if(property_exists($contactsList->contacts[0], 'phonePrefix') &&
+                   property_exists($contactsList->contacts[0], 'phoneNumber')){
+                    foreach($contactsList->contacts as $contact){
+                        $contacts[] = trim($contact->phonePrefix) . ($contact->phoneNumber);
+                    }
+                }
+            } else {
+                $contacts = $contactsList;
             }
-*/
+
             $result = $this->app->userRepository->findSubscribedContacts($contacts);
 
             $payload->data = $result;
