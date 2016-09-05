@@ -113,6 +113,8 @@ class Users
         try{
 
             $body = $this->app->request()->getBody();
+            $contacts = json_decode($body);
+/*
             $contactList = json_decode($body);
 
             $contacts = array();
@@ -120,7 +122,7 @@ class Users
 
                 $contacts[] = trim($contact->phonePrefix) . ($contact->phoneNumber);
             }
-
+*/
             $result = $this->app->userRepository->findSubscribedContacts($contacts);
 
             $payload->data = $result;
