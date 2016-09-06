@@ -55,6 +55,24 @@ class Sms
     public function sendCustomSms(){
         $payload = new \stdClass();
 
+
+        if($this->app->request()->params('to') != null && $this->app->request()->params('text')){
+            $to = $this->app->request()->params('to');
+            $text = $this->app->request()->params('text');
+
+            $result = $this->sendSms($to, $text);
+
+            $payload->data = (string) $result;
+
+        } else {
+            $this->app->log->error(APP_NAME . " sendCustomSms : Empty body");
+            $payload->error = new Error(400, " sendCustomSms : Empty body", '');
+
+        }
+        $this->response->headers->set('Content-Type', 'application/json');
+        echo json_encode($payload);
+
+/*
         $body = $this->app->request()->getBody();
 
         if (!empty($body)) {
@@ -63,7 +81,7 @@ class Sms
 
                 if($bodyObj != null && property_exists($bodyObj, 'to') && property_exists($bodyObj, 'content')){
                     $to      = $bodyObj->to;
-                    $text = $bodyObj->content;
+                    $text = $bodyObj->text;
 
                     $result = $this->sendSms($to, $text);
 
@@ -85,7 +103,7 @@ class Sms
         }
         $this->response->headers->set('Content-Type', 'application/json');
         echo json_encode($payload);
-
+*/
     }
 
     public function sendUserRegisteredSms(){
