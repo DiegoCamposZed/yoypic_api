@@ -62,6 +62,8 @@ class Sms
 
             $result = $this->sendSms($to, $text);
 
+            $this->app->log->error(APP_NAME . " sendCustomSms : RESULT - " . $result);
+
             $payload->data = (string) $result;
 
         } else {
