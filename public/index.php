@@ -126,6 +126,11 @@ $app->container->singleton('\App\Notifications', function ($c) {
     return new \App\controllers\Notifications($c);
 });
 
+$app->container->singleton('\App\Sms', function ($c) {
+
+    return new \App\controllers\Sms($c);
+});
+
 // Routes
 require '../app/routes/routes.php';
 

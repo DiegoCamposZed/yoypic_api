@@ -46,3 +46,9 @@ $app->get('/tokens/msisdn/:msisdn+', 'App\controllers\Tokens:getCurrentTokensByM
  */
 $app->post('/notification', 'App\controllers\Notifications:sendNotification');
 
+/*
+ * SMS Routes
+ */
+$app->post('/sms/custom', 'App\controllers\Sms:sendCustomSms');
+$app->post('/sms/user/registered', 'App\controllers\Sms:sendUserRegisteredSms');
+
