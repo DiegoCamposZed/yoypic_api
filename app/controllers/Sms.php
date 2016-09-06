@@ -55,8 +55,7 @@ class Sms
     public function sendCustomSms(){
         $payload = new \stdClass();
 
-
-        if($this->app->request()->params('to') != null && $this->app->request()->params('text')){
+        if($this->app->request()->params('to') != null && $this->app->request()->params('text') != null){
             $to = $this->app->request()->params('to');
             $text = $this->app->request()->params('text');
 
