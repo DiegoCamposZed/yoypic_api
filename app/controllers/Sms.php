@@ -66,8 +66,18 @@ class Sms
             $payload->data = (string) $result;
 
         } else {
-            $this->app->log->error(APP_NAME . " sendCustomSms : Empty body");
-            $payload->error = new Error(400, " sendCustomSms : Empty body", '');
+            $body = $this->app->request()->getBody();
+            $bodyObj = json_decode($body);
+            if($bodyObj!= null){
+                $result = $this->sendSms($bodyObj->to, $bodyObj->text);
+                $this->app->log->error(APP_NAME . " sendCustomSms : RESULT - " . $result);
+
+                $payload->data = (string) $result;
+
+            } else {
+                $this->app->log->error(APP_NAME . " sendCustomSms : Empty body");
+                $payload->error = new Error(400, " sendCustomSms : Empty body", '');
+            }
 
         }
         $this->response->headers->set('Content-Type', 'application/json');
