@@ -14,7 +14,7 @@ class Sms
     protected $request;
     protected $response;
 
-    public function sendSms($to, $content)
+    public function sendSmsClickatell($to, $content)
     {
 
 
@@ -52,6 +52,52 @@ class Sms
 
     }
 
+    public function sendSmsTwilio($to, $content)
+    {
+
+
+        if (!empty($to) && !empty($content)) {
+
+            $id = "AC2d26c8ab9f65aad99b8574f71f81b7b3";
+            $token = "6f8aec52823dc699f4afc4acb6142aed";
+            $messagingServiceSid="MGe50a4fcc22149b62222f1f9a9d5a30ed";
+            $from = "+17868013845";
+            $url = "https://api.twilio.com/2010-04-01/Accounts/$id/SMS/Messages.json";
+
+            $requestBody = array();
+            $requestBody['From']                = $from;
+            $requestBody['To']                  = $to;
+            $requestBody['Body']                = $content;
+            $requestBody['MessagingServiceSid'] = $messagingServiceSid;
+
+            $encodedAuth = base64_encode($id . ':' . $token);
+            try {
+                $request = $this->app->guzzle->post($url,
+                    [
+                        'Authorization' => 'Basic ' . $encodedAuth,
+                        'Content-Type'  => 'application/json; charset=utf-8'
+                    ],
+                    $requestBody,
+                    []
+                );
+
+                $response = $request->send();
+
+
+                $this->app->log->info(APP_NAME . " Send SMS: to: " . $to . " Text: " . $content . " - Result: " . $response);
+
+                return $response->getBody();
+
+            } catch (RequestException $e) {
+
+                $this->app->log->error(APP_NAME . " Send Notification ERROR REQUEST : " .$e->getRequest());
+
+            }
+        }
+        return null;
+
+    }
+
     public function sendCustomSms(){
         $payload = new \stdClass();
 
@@ -59,7 +105,11 @@ class Sms
             $to = $this->app->request()->params('to');
             $text = $this->app->request()->params('text');
 
-            $result = $this->sendSms($to, $text);
+            // Clickatell platform
+//            $result = $this->sendSmsClickatell($to, $text);
+
+            // Twilio platform
+            $result = $this->sendSmsTwilio($to, $text);
 
             $this->app->log->error(APP_NAME . " sendCustomSms : RESULT - " . $result);
 
@@ -69,10 +119,12 @@ class Sms
             $body = $this->app->request()->getBody();
             $bodyObj = json_decode($body);
             if($bodyObj!= null){
-                $result = $this->sendSms($bodyObj->to, $bodyObj->text);
-                $this->app->log->error(APP_NAME . " sendCustomSms : RESULT - " . $result);
+//                $result = $this->sendSms($bodyObj->to, $bodyObj->text);
+                $result = $this->sendSmsTwilio($bodyObj->to, $bodyObj->text);
 
-                $payload->data = (string) $result;
+                $this->app->log->info(APP_NAME . " sendCustomSms : RESULT - " . $result);
+
+                $payload->data = json_decode($result);
 
             } else {
                 $this->app->log->error(APP_NAME . " sendCustomSms : Empty body");
@@ -82,39 +134,6 @@ class Sms
         }
         $this->response->headers->set('Content-Type', 'application/json');
         echo json_encode($payload);
-
-/*
-        $body = $this->app->request()->getBody();
-
-        if (!empty($body)) {
-            try {
-                $bodyObj = json_decode($body);
-
-                if($bodyObj != null && property_exists($bodyObj, 'to') && property_exists($bodyObj, 'content')){
-                    $to      = $bodyObj->to;
-                    $text = $bodyObj->text;
-
-                    $result = $this->sendSms($to, $text);
-
-                    $payload->data = (string) $result;
-                } else {
-                    $this->app->log->error(APP_NAME . " sendCustomSms : Bad request ");
-                    $payload->error = new Error(400, " sendCustomms : Bad request", '');
-                }
-            } catch (RequestException $e) {
-
-                $this->app->log->error(APP_NAME . " sendCustomSms : Server Error " . $e->getRequest());
-                $payload->error = new Error(500, " Server Error ", '');
-
-            }
-        } else {
-            $this->app->log->error(APP_NAME . " sendCustomSms : Empty body");
-            $payload->error = new Error(400, " sendCustomSms : Empty body", '');
-
-        }
-        $this->response->headers->set('Content-Type', 'application/json');
-        echo json_encode($payload);
-*/
     }
 
     public function sendUserRegisteredSms(){
