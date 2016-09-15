@@ -64,6 +64,10 @@ class Sms
             $from = "+17868013845";
             $url = "https://api.twilio.com/2010-04-01/Accounts/$id/SMS/Messages.json";
 
+            // Fix: when to doesn't have '+' prefix
+            if(strpos($to , "+") === false)
+                $to = '+' . $to;
+
             $requestBody = array();
             $requestBody['From']                = $from;
             $requestBody['To']                  = $to;
@@ -71,6 +75,7 @@ class Sms
             $requestBody['MessagingServiceSid'] = $messagingServiceSid;
 
             $encodedAuth = base64_encode($id . ':' . $token);
+
             try {
                 $request = $this->app->guzzle->post($url,
                     [
