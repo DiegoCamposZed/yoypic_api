@@ -15,6 +15,8 @@ class FirebaseNotification implements \JsonSerializable
     private $to;
     private $notification;
     private $data;
+    private $content_available;
+    private $priority;
 
     /**
      * @param $to
@@ -26,6 +28,11 @@ class FirebaseNotification implements \JsonSerializable
         $this->to = $to;
         $this->notification = $notification;
         $this->data = $data;
+        $this->content_available = false;
+        if(!empty($data))
+            $this->content_available = true;
+        $this->priority = 'high';
+
     }
 
     /**
@@ -88,12 +95,16 @@ class FirebaseNotification implements \JsonSerializable
             return [
                 'to' => $this->to,
                 'data' => get_object_vars($this->data),
-                'notification' => get_object_vars($this->notification)
+                'notification' => get_object_vars($this->notification),
+                'content_available' => $this->content_available,
+                'priority' => $this->priority
             ];
         else
             return [
                 'to' => $this->to,
-                'data' => $this->data->content
+                'data' => $this->data->content,
+                'content_available' => $this->content_available,
+                'priority' => $this->priority
             ];
 
     }
