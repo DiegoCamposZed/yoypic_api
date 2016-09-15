@@ -8,6 +8,7 @@
 namespace App\controllers;
 
 use App\models\Error;
+use Guzzle\Http\Exception\RequestException;
 
 class Sms
 {
@@ -62,17 +63,18 @@ class Sms
             $token = "6f8aec52823dc699f4afc4acb6142aed";
             $messagingServiceSid="MGe50a4fcc22149b62222f1f9a9d5a30ed";
             $from = "+17868013845";
-            $url = "https://api.twilio.com/2010-04-01/Accounts/$id/SMS/Messages.json";
+            $url = "https://api.twilio.com/2010-04-01/Accounts/$id/Messages.json";
 
             // Fix: when to doesn't have '+' prefix
             if(strpos($to , "+") === false)
                 $to = '+' . $to;
 
             $requestBody = array();
-            $requestBody['From']                = $from;
+            // Don´t send From to get Sender from Twilio
+//            $requestBody['From']                = $from;
             $requestBody['To']                  = $to;
-            $requestBody['Body']                = $content;
             $requestBody['MessagingServiceSid'] = $messagingServiceSid;
+            $requestBody['Body']                = $content;
 
             $encodedAuth = base64_encode($id . ':' . $token);
 
@@ -80,7 +82,7 @@ class Sms
                 $request = $this->app->guzzle->post($url,
                     [
                         'Authorization' => 'Basic ' . $encodedAuth,
-                        'Content-Type'  => 'application/json; charset=utf-8'
+                        'Content-Type'  => 'application/x-www-form-urlencoded'
                     ],
                     $requestBody,
                     []
