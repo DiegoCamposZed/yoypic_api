@@ -113,7 +113,7 @@ class Sms
 
             $this->app->log->error(APP_NAME . " sendCustomSms : RESULT - " . $result);
 
-            $payload->data = (string) $result;
+            $payload->data = json_decode($result);
 
         } else {
             $body = $this->app->request()->getBody();
