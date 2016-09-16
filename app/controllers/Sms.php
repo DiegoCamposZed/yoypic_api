@@ -118,7 +118,7 @@ class Sms
             // Twilio platform
             $result = $this->sendSmsTwilio($to, $text);
 
-            $this->app->log->error(APP_NAME . " sendCustomSms : FORM - RESULT - " . $result);
+            $this->app->log->info(APP_NAME . " sendCustomSms : FORM - RESULT - " . $result);
 
             $payload->data = json_decode($result);
 
